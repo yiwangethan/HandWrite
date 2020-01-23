@@ -1,0 +1,66 @@
+def enhance_pic(pic, sen_heng, sen_shu, sen_dian, sen_xie, able):
+    # 要求传入[0,1]内的矩阵，行数为28，列数应当保证在行数为28的情况下与图成比例
+    # 函数的功能为增粗图像
+    # able是表征函数是否使能的标志
+    imort numpy as np
+    if able:
+        res = pic
+        pic = 1-pic
+        X_kr = np.mat([[-1, -1, -1, -1], [1, 1, 1, 1]])
+        Y_kr = X_kr.T
+        Point_kr = np.mat([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
+        xie_RB = np.mat([[1, -1, -1], [-1, 1, -1], [-1, -1, 1]])  # 检测向右下直线的卷积核
+        xie_RT = np.mat([[-1, -1, 1], [-1, 1, -1], [1, -1, -1]])  # 检测向右下直线的卷积核
+        # 定义用于检测的3个卷积核
+        hang, lie = np.shape(pic)
+
+        # 进行横向加粗
+        for i in range(0, hang-2+1):
+            for j in range(0, lie-4+1):
+                temp = np.multiply(X_kr, pic[i:i+2, j:j+4])
+                flag = np.sum(temp)
+                if abs(flag) >= sen_heng:
+                    res[i:i+2, j:j+4] = 0
+        # 进行纵向加粗
+        for i in range(0, hang-4+1):
+            for j in range(0, lie-2+1):
+                temp = np.multiply(Y_kr, pic[i:i+4, j:j+2])
+                flag = np.sum(temp)
+                if abs(flag) >= sen_shu:
+                    res[i:i+4, j:j+2] = 0
+        # 对点进行增强
+        for i in range(0, hang-3+1):
+            for j in range(0, lie-3+1):
+                temp = np.multiply(Point_kr, pic[i:i+3, j:j+3])
+                flag = np.sum(temp)
+                if abs(flag) >= sen_dian:
+                    res[i:i+3, j:j+3] = 0
+        # 对向右下的直线进行增强
+        for i in range(0, hang-3+1):
+            for j in range(0, lie-3+1):
+                temp = np.multiply(xie_RB, pic[i:i+3, j:j+3])
+                flag = np.sum(temp)
+                if abs(flag) >= sen_xie:
+                    res[i, j] = 0
+                    res[i+1, j] = 0
+                    res[i, j+1] = 0
+                    res[i+1, j+1] = 0
+                    res[i+1, j+2] = 0
+                    res[i+2, j+1] = 0
+                    res[i+2, j+2] = 0
+    # 对向右上的直线进行增强
+        for i in range(0, hang-3+1):
+            for j in range(0, lie-3+1):
+                temp = np.multiply(xie_RT, pic[i:i+3, j:j+3])
+                flag = np.sum(temp)
+                if abs(flag) >= sen_xie:
+                    res[i+2, j] = 0
+                    res[i+1, j] = 0
+                    res[i, j+1] = 0
+                    res[i+1, j+1] = 0
+                    res[i+1, j+2] = 0
+                    res[i+2, j+1] = 0
+                    res[i, j+2] = 0
+        return res
+    if able == False:
+        return pic

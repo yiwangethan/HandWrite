@@ -1,0 +1,5 @@
+a=x_datap[5,0:28*28]
+b=a.reshape((1,-1))
+p=a.reshape((28,28))
+plt.imshow(p)
+sess.run(y_conv,feed_dict={x:b,keep_prob: 1.0})
